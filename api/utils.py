@@ -433,6 +433,15 @@ def event_intervals(
                 # ================================================
                 #                Concat Logic
                 # ================================================
+                # filter out events that dont have end events
+                # ie repeated event codes 1,7,1,7,1,1,7
+                # the 1 did not have a closing 7 event code
+                # TODO: highlight non closing event codes in table
+                df_ec = df_ec.filter(
+                    pl.col("event_code")
+                    != pl.col("event_code").shift(-1, fill_value=True)
+                )
+
                 # Separate all start event codes
                 df_start = df_ec.filter(
                     pl.col("event_code") == ec_pair["event_start"],
